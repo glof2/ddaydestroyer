@@ -793,17 +793,11 @@ end)
 
 -- Noclip
 RunService.Stepped:Connect(function()
-    pcall(function() 
+    pcall(function()
         player_data["character"].HumanoidRootPart.CanCollide = getgenv().collide
         player_data["character"].Head.CanCollide = getgenv().collide
         player_data["character"].UpperTorso.CanCollide = getgenv().collide
         player_data["character"].LowerTorso.CanCollide = getgenv().collide
-        player_data["character"].LeftUpperArm.CanCollide = getgenv().collide
-        player_data["character"].LeftLowerArm.CanCollide = getgenv().collide
-        player_data["character"].LeftHand.CanCollide = getgenv().collide
-        player_data["character"].RightUpperArm.CanCollide = getgenv().collide
-        player_data["character"].RightLowerArm.CanCollide = getgenv().collide
-        player_data["character"].RightHand.CanCollide = getgenv().collide
     end)
 end)
 
@@ -817,7 +811,7 @@ local ui_config =
 {
     WindowName = "D-DAY DESTROYER | made by mayoo",
 	Color = Color3.fromRGB(255,128,64),
-	Keybind = Enum.KeyCode.RightBracket
+	Keybind = Enum.KeyCode.M
 }
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Roblox/main/BracketV3.lua"))()
 local window = Library:CreateWindow(ui_config, game:GetService("CoreGui"))
