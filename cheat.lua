@@ -1,3 +1,18 @@
+repeat wait() until game:IsLoaded()
+
+-- Fail checks
+if game.GameId ~= 901793731 then
+    game.Players.LocalPlayer:Kick("D-Day Destroyer only works on D-Day .")
+end
+
+if getgenv().ddestroyer_executed == true then
+    game.Players.LocalPlayer:Kick("DDestroyer was already executed once.")
+    return
+else
+    getgenv().ddestroyer_executed = true
+end
+
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -459,18 +474,6 @@ local function getClosestPlayer(target_parts, fov, max_distance, on_screen, in_v
     return current_char, current_aim_part
 end
 
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == getgenv().aimbot_button then
-        getgenv().aiming = true
-    end
-end)
-
-UserInputService.InputEnded:Connect(function(input)
-    if input.KeyCode == getgenv().aimbot_button then
-        getgenv().aiming = false
-    end
-end)
-
 -- Aimbot fov circle
 local fovcircle = Drawing.new("Circle")
 fovcircle.Visible = getgenv().aimbotfovcircle
@@ -840,7 +843,6 @@ local main_tab = window:CreateTab("Main")
 local aimbot_section = main_tab:CreateSection("Aimbot")
 
 -- aimbot
-local aimbot_label = aimbot_section:CreateLabel("Hold LEFT ALT to turn on Aimbot")
 local aimbot_toggle = aimbot_section:CreateToggle("ON/OFF", nil, function(state)
     getgenv().aimbot = state
 end)
@@ -850,9 +852,13 @@ local silent_toggle = aimbot_section:CreateToggle("Silent", nil, function(state)
     getgenv().silent = state
 end)
 
--- aimbot_always_on
-local aimbot_always_on_toggle = aimbot_section:CreateToggle("Aimbot always on (don't need to hold ALT)", nil, function(state)
-    getgenv().aimbot_always_on = state
+-- aiming
+local aiming_toggle = aimbot_section:CreateToggle("Aimbot bind", nil, function(state)
+    getgenv().aiming = state
+end)
+
+local aiming_keybind = aiming_toggle:CreateKeybind(tostring(getgenv().aimbot_button):gsub("Enum.KeyCode.", ""), function(key)
+	getgenv().aimbot_button = Enum.KeyCode[key]
 end)
 
 -- silentautoshoot
@@ -1127,3 +1133,13 @@ local collide_toggle =  noclip_section:CreateToggle("ON/OFF", nil, function(stat
     getgenv().collide = not state
 end)
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
+local toggle_gui_section = local_player_tab:CreateSection("Toggle GUI")
+
+local ui_toggle = toggle_gui_section:CreateToggle("UI Toggle", nil, function(State)
+	window:Toggle(State)
+end)
+local ui_keybind = ui_toggle:CreateKeybind(tostring(ui_config.Keybind):gsub("Enum.KeyCode.", ""), function(key)
+	ui_config.Keybind = Enum.KeyCode[key]
+end)
+
+ui_toggle:SetState(true)
