@@ -3,6 +3,7 @@ repeat wait() until game:IsLoaded()
 -- Fail checks
 if game.PlaceId ~= 901793731 then
     game.Players.LocalPlayer:Kick("D-Day Destroyer only works on D-Day .")
+    return
 end
 
 if getgenv().ddestroyer_executed == true then
