@@ -409,21 +409,6 @@ local function getClosestPlayer(target_parts, fov, max_distance, on_screen, in_v
             continue
         end
         
-        local root = character:FindFirstChild("HumanoidRootPart")
-        if root == nil then
-            continue
-        end
-        
-        if (root.Position - player_data["root"].Position).Magnitude <= 8 then
-            continue
-        end
-
-        local humanoid = character:FindFirstChild("Humanoid")
-
-        if humanoid == nil or humanoid:GetState() == Enum.HumanoidStateType.Dead or humanoid.Health <= 0 then
-            continue
-        end
-
         local aim_part_pos, aim_part_onscreen = camera:WorldToViewportPoint(aim_part.Position)
         if not aim_part_onscreen and on_screen then
             continue
@@ -439,13 +424,27 @@ local function getClosestPlayer(target_parts, fov, max_distance, on_screen, in_v
             continue
         end
 
+        local humanoid = character:FindFirstChild("Humanoid")
+
+        if humanoid == nil or humanoid:GetState() == Enum.HumanoidStateType.Dead or humanoid.Health <= 0 then
+            continue
+        end
+
+        local root = character:FindFirstChild("HumanoidRootPart")
+        if root == nil then
+            continue
+        end
+        
+        if (root.Position - player_data["root"].Position).Magnitude <= 8 then
+            continue
+        end        
+
         local aim_part_distance = getDistanceFromPlayer(aim_part)
         if aim_part_distance < current_distance then
             current_char = character
             current_distance = aim_part_distance
             current_aim_part = aim_part
         end
-
     end
     return current_char, current_aim_part
 end
@@ -535,8 +534,8 @@ end
 RunService.Heartbeat:Connect(function()
     if getgenv().aimbot then
         if getgenv().aiming then 
-            local closest, aim_part = getClosestPlayer(getgenv().aimbotparts, getgenv().aimbotfov, math.huge, getgenv().aimbotfov < 2000, true, getgenv().closest_to_cursor)
             if not getgenv().silent then
+                local closest, aim_part = getClosestPlayer(getgenv().aimbotparts, getgenv().aimbotfov, math.huge, getgenv().aimbotfov < 2000, true, getgenv().closest_to_cursor)
                 local camera = workspace.CurrentCamera
                 if closest and aim_part then
                     local part_pos = aim_part.Position
@@ -544,6 +543,7 @@ RunService.Heartbeat:Connect(function()
                 end
             else
                 if getgenv().silentautoshoot then
+                    local closest, aim_part = getClosestPlayer(getgenv().aimbotparts, getgenv().aimbotfov, math.huge, getgenv().aimbotfov < 2000, true, getgenv().closest_to_cursor)
                     if closest and aim_part then
                         for i, v in pairs(player_data["character"]:GetChildren()) do
                             if not v:IsA("Tool") then
@@ -783,16 +783,18 @@ end)
 
 -- Noclip
 RunService.Stepped:Connect(function()
-    player_data["character"].HumanoidRootPart.CanCollide = getgenv().collide
-    player_data["character"].Head.CanCollide = getgenv().collide
-    player_data["character"].UpperTorso.CanCollide = getgenv().collide
-    player_data["character"].LowerTorso.CanCollide = getgenv().collide
-    player_data["character"].LeftUpperArm.CanCollide = getgenv().collide
-    player_data["character"].LeftLowerArm.CanCollide = getgenv().collide
-    player_data["character"].LeftHand.CanCollide = getgenv().collide
-    player_data["character"].RightUpperArm.CanCollide = getgenv().collide
-    player_data["character"].RightLowerArm.CanCollide = getgenv().collide
-    player_data["character"].RightHand.CanCollide = getgenv().collide
+    pcall(function() 
+        player_data["character"].HumanoidRootPart.CanCollide = getgenv().collide
+        player_data["character"].Head.CanCollide = getgenv().collide
+        player_data["character"].UpperTorso.CanCollide = getgenv().collide
+        player_data["character"].LowerTorso.CanCollide = getgenv().collide
+        player_data["character"].LeftUpperArm.CanCollide = getgenv().collide
+        player_data["character"].LeftLowerArm.CanCollide = getgenv().collide
+        player_data["character"].LeftHand.CanCollide = getgenv().collide
+        player_data["character"].RightUpperArm.CanCollide = getgenv().collide
+        player_data["character"].RightLowerArm.CanCollide = getgenv().collide
+        player_data["character"].RightHand.CanCollide = getgenv().collide
+    end)
 end)
 
 -- Main Code
