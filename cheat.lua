@@ -1122,7 +1122,7 @@ end)
 
 -- jumppowerval
 local jumppowerval_slider =  jumppower_section:CreateSlider("Value", 1, 100, nil, true, function(value)
-    getgenv().walkspeedval = value
+    getgenv().jumppowerval = value
 end)
 
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
