@@ -30,12 +30,15 @@ getgenv().aimbotparts = {}
 getgenv().silent = false
 getgenv().silentautoshoot = false
 getgenv().aimbot_button = Enum.KeyCode.LeftAlt
+getgenv().aimbot_always_on = false
 
 -- Gun settings X
 getgenv().everygunauto = false
 getgenv().nocamerashake = false
 getgenv().nospread = false
 getgenv().infiniteammo = false
+getgenv().aimview_tog = false
+getgenv().aimview = 0
 
 -- Esp X
 getgenv().player_esp = false
@@ -61,6 +64,8 @@ getgenv().walkspeedtog = false
 getgenv().walkspeedval = 64
 getgenv().jumppowertog = false
 getgenv().jumppowerval = 64
+getgenv().walkspeedtog = false
+getgenv().walkspeedval = 64
 getgenv().collide = true
 
 -- Player data
@@ -154,6 +159,11 @@ local function setGunSettings(gun)
         end
         if getgenv().infiniteammo then
             setupvalue(ToolAction, 5, gun_settings.AmmoPerClip)
+        end
+        if getgenv().aimview_tog then
+            local table_ = getupvalue(ToolAction, 10)
+            table_.AimView = getgenv().aimview
+            setupvalue(ToolAction, 10, table_)
         end
         wait()
     end
@@ -382,11 +392,11 @@ local function getClosestPlayer(target_parts, fov, max_distance, on_screen, in_v
     local current_aimpart = nil
     local current_distance_from_cursor = fov + 1
     for index, player in pairs(Players:GetPlayers()) do
-        if player == player_data["player"] or player.TeamColor == player_data["player"].TeamColor then
+        if player == player_data["player"] or player.TeamColor == player_data["player"].TeamColor or player.Name == "#!D" then
             continue
         end
         local character = player.Character
-        if character == nil or character:FindFirstChild("ForceField") then
+        if character == nil or character:FindFirstChild("ForceField") or character.Name == "#!D" then
             continue
         end
  
@@ -533,7 +543,7 @@ end
 -- Aimbot logic
 RunService.Heartbeat:Connect(function()
     if getgenv().aimbot then
-        if getgenv().aiming then 
+        if getgenv().aiming or getgenv().aimbot_always_on then 
             if not getgenv().silent then
                 local closest, aim_part = getClosestPlayer(getgenv().aimbotparts, getgenv().aimbotfov, math.huge, getgenv().aimbotfov < 2000, true, getgenv().closest_to_cursor)
                 local camera = workspace.CurrentCamera
@@ -568,7 +578,7 @@ oldClientBullet = hookfunction(FrameworkLib.modules.Client_Bullet, function(...)
     if getgenv().nospread then
         args[4] = CFrame.Angles(0,0,0)
     end
-    if getgenv().aimbot and getgenv().aiming and getgenv().silent then
+    if getgenv().aimbot and (getgenv().aiming or getgenv().aimbot_always_on) and getgenv().silent then
         --[[
             [1] = shooting_player, 
             [2] = weapon, 
@@ -805,13 +815,15 @@ mineEsp()
 -- GUI
 local ui_config = 
 {
-    WindowName = "D-DAY DESTROYER",
+    WindowName = "D-DAY DESTROYER | made by mayoo",
 	Color = Color3.fromRGB(255,128,64),
 	Keybind = Enum.KeyCode.RightBracket
 }
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/AlexR32/Roblox/main/BracketV3.lua"))()
 local window = Library:CreateWindow(ui_config, game:GetService("CoreGui"))
 
+
+--===============================================================================================================================================================
 -- Main tab
 local main_tab = window:CreateTab("Main")
 
@@ -829,6 +841,7 @@ local main_tab = window:CreateTab("Main")
     getgenv().silent = false X
     getgenv().silentautoshoot = false X
     getgenv().aimbot_button = Enum.KeyCode.E X
+    getgenv().aimbot_always_on = false X
 ]]
 local aimbot_section = main_tab:CreateSection("Aimbot")
 
@@ -841,6 +854,11 @@ end)
 -- silent
 local silent_toggle = aimbot_section:CreateToggle("Silent", nil, function(state)
     getgenv().silent = state
+end)
+
+-- aimbot_always_on
+local aimbot_always_on_toggle = aimbot_section:CreateToggle("Aimbot always on (don't need to hold ALT)", nil, function(state)
+    getgenv().aimbot_always_on = state
 end)
 
 -- silentautoshoot
@@ -907,6 +925,8 @@ getgenv().everygunauto = false
 getgenv().nocamerashake = false
 getgenv().nospread = false
 getgenv().infiniteammo = true
+getgenv().aimview_tog = false
+getgenv().aimview = 0
 ]]
 local gunsettings_section = main_tab:CreateSection("Gun settings")
 
@@ -928,6 +948,16 @@ end)
 -- infiniteammo
 local infiniteammo_toggle = gunsettings_section:CreateToggle("Infinite ammo", nil, function(state)
     getgenv().infiniteammo = state
+end)
+
+-- aimview_tog
+local aimview_tog_toggle = gunsettings_section:CreateToggle("Aiming fov", nil, function(state)
+    getgenv().aimview_tog = state
+end)
+
+-- aimview
+local aimview_slider = gunsettings_section:CreateSlider("FOV", 1, 300, nil, true, function(value)
+    getgenv().aimview = value
 end)
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- ESP section
