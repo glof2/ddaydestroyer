@@ -411,11 +411,31 @@ local function getClosestPlayer(target_parts, fov, max_distance, on_screen, in_v
         if player == player_data["player"] or player.TeamColor == player_data["player"].TeamColor or player.Name == "#!D" then
             continue
         end
+        
+
         local character = player.Character
         if character == nil or character:FindFirstChild("ForceField") or character.Name == "#!D" then
             continue
         end
- 
+
+        local root = character:FindFirstChild("HumanoidRootPart")
+        if root == nil then
+            continue
+        end
+        
+        -- Distance check (weird game puts player inside u after kill and humanoid isn't dead????)
+        local root_distance = getDistanceFromPlayer(root)
+        if root_distance <= 8 or root_distance > current_distance then
+            continue
+        end   
+
+        -- is dead check
+        local humanoid = character:FindFirstChild("Humanoid")
+        if humanoid == nil or humanoid:GetState() == Enum.HumanoidStateType.Dead or humanoid.Health <= 0 then
+            continue
+        end
+
+        -- Getting aim part
         local aim_part = nil
         for i, v in pairs(target_parts) do
             local part = character:FindFirstChild(v)
@@ -450,27 +470,9 @@ local function getClosestPlayer(target_parts, fov, max_distance, on_screen, in_v
             continue
         end
 
-        local humanoid = character:FindFirstChild("Humanoid")
-
-        if humanoid == nil or humanoid:GetState() == Enum.HumanoidStateType.Dead or humanoid.Health <= 0 then
-            continue
-        end
-
-        local root = character:FindFirstChild("HumanoidRootPart")
-        if root == nil then
-            continue
-        end
-        
-        if (root.Position - player_data["root"].Position).Magnitude <= 8 then
-            continue
-        end        
-
-        local aim_part_distance = getDistanceFromPlayer(aim_part)
-        if aim_part_distance < current_distance then
-            current_char = character
-            current_distance = aim_part_distance
-            current_aim_part = aim_part
-        end
+        current_char = character
+        current_distance = root_distance
+        current_aim_part = aim_part
     end
     return current_char, current_aim_part
 end
@@ -810,7 +812,7 @@ playerEsp()
 playerTracers()
 mineEsp()
 
--- GUI
+------------------------------------------------------------------------------ GUI ------------------------------------------------------------------------------
 local ui_config = 
 {
     WindowName = "D-DAY DESTROYER | made by mayoo",
@@ -825,8 +827,7 @@ local window = Library:CreateWindow(ui_config, game:GetService("CoreGui"))
 -- Main tab
 local main_tab = window:CreateTab("Main")
 
-
-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
 -- Aimbot section
 --[[
     getgenv().aimbot = false X
